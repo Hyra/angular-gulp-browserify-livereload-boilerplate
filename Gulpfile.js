@@ -72,15 +72,17 @@ gulp.task('browserify', function() {
 
 // Views task
 gulp.task('views', function() {
-  // Get our index.html
-  gulp.src('app/index.html')
-  // And put it in the dist folder
-  .pipe(gulp.dest('dist/'));
+    // Get our index.html
+    gulp.src('app/index.html')
+        // And put it in the dist folder
+        .pipe(gulp.dest('dist/'))
+        .pipe(refresh(lrserver));
 
-  // Any other view files from app/views
-  gulp.src('app/views/**/*')
-  // Will be put in the dist/views folder
-  .pipe(gulp.dest('dist/views/'));
+    // Any other view files from app/views
+    gulp.src('app/views/**/*')
+        // Will be put in the dist/views folder
+        .pipe(gulp.dest('dist/views/'))
+        .pipe(refresh(lrserver));
 });
 
 gulp.task('watch', ['lint'], function() {
@@ -93,4 +95,8 @@ gulp.task('watch', ['lint'], function() {
   gulp.watch(['app/styles/**/*.scss'], [
     'styles'
   ]);
+  
+  gulp.watch(['app/**/*.html'], [
+        'views'
+    ]);
 });
