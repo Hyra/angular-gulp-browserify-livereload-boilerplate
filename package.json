@@ -4,7 +4,6 @@
   "devDependencies": {
     "connect-livereload": "~0.4.0",
     "gulp-concat": "~2.2.0",
-    "gulp-clean": "~0.2.4",
     "gulp-embedlr": "~0.5.2",
     "gulp-util": "~2.2.14",
     "express": "~4.1.1",
