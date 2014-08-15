@@ -1,5 +1,6 @@
+'use strict';
+
 var gulp = require('gulp'),
-    gutil = require('gulp-util'),
     jshint = require('gulp-jshint'),
     browserify = require('gulp-browserify'),
     concat = require('gulp-concat'),
@@ -29,10 +30,10 @@ server.all('/*', function(req, res) {
 gulp.task('dev', ['clean', 'views', 'styles', 'lint', 'browserify'], function() { });
 
 // Clean task
-gulp.task('clean', function(cb) {
+gulp.task('clean', function() {
 	gulp.src('./dist/views', { read: false }) // much faster
   .pipe(rimraf({force: true}));
-})
+});
 
 // JSHint task
 gulp.task('lint', function() {
@@ -47,7 +48,7 @@ gulp.task('styles', function() {
   // The onerror handler prevents Gulp from crashing when you make a mistake in your SASS
   .pipe(sass({onError: function(e) { console.log(e); } }))
   // Optionally add autoprefixer
-  .pipe(autoprefixer("last 2 versions", "> 1%", "ie 8"))
+  .pipe(autoprefixer('last 2 versions', '> 1%', 'ie 8'))
   // These last two should look familiar now :)
   .pipe(gulp.dest('dist/css/'));
 });
@@ -68,15 +69,15 @@ gulp.task('browserify', function() {
 
 // Views task
 gulp.task('views', function() {
-    // Get our index.html
-    gulp.src('app/index.html')
-    // And put it in the dist folder
-    .pipe(gulp.dest('dist/'))
+  // Get our index.html
+  gulp.src('app/index.html')
+  // And put it in the dist folder
+  .pipe(gulp.dest('dist/'));
 
-    // Any other view files from app/views
-    gulp.src('app/views/**/*')
-    // Will be put in the dist/views folder
-    .pipe(gulp.dest('dist/views/'))
+  // Any other view files from app/views
+  gulp.src('app/views/**/*')
+  // Will be put in the dist/views folder
+  .pipe(gulp.dest('dist/views/'));
 });
 
 gulp.task('watch', ['lint'], function() {
@@ -102,6 +103,5 @@ gulp.task('watch', ['lint'], function() {
   gulp.watch('./dist/**').on('change', refresh.changed);
 
 });
-
 
 gulp.task('default', ['dev', 'watch']);
