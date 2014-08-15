@@ -3,15 +3,13 @@ var gulp = require('gulp'),
     jshint = require('gulp-jshint'),
     browserify = require('gulp-browserify'),
     concat = require('gulp-concat'),
-    clean = require('gulp-clean'),
+    rimraf = require('gulp-rimraf'),
     sass = require('gulp-sass'),
     autoprefixer = require('gulp-autoprefixer');
 
 // Modules for webserver and livereload
-var embedlr = require('gulp-embedlr'),
+var express = require('express'),
     refresh = require('gulp-livereload'),
-    lrserver = require('tiny-lr')(),
-    express = require('express'),
     livereload = require('connect-livereload'),
     livereloadport = 35729,
     serverport = 5000;
@@ -28,14 +26,13 @@ server.all('/*', function(req, res) {
 });
 
 // Dev task
-gulp.task('dev', ['views', 'styles', 'lint', 'browserify'], function() {
-  // Start webserver
-  server.listen(serverport);
-  // Start live reload
-  lrserver.listen(livereloadport);
-  // Run the watch task, to keep taps on changes
-  gulp.run('watch');
-});
+gulp.task('dev', ['clean', 'views', 'styles', 'lint', 'browserify'], function() { });
+
+// Clean task
+gulp.task('clean', function(cb) {
+	gulp.src('./dist/views', { read: false }) // much faster
+  .pipe(rimraf({force: true}));
+})
 
 // JSHint task
 gulp.task('lint', function() {
@@ -52,8 +49,7 @@ gulp.task('styles', function() {
   // Optionally add autoprefixer
   .pipe(autoprefixer("last 2 versions", "> 1%", "ie 8"))
   // These last two should look familiar now :)
-  .pipe(gulp.dest('dist/css/'))
-  .pipe(refresh(lrserver));
+  .pipe(gulp.dest('dist/css/'));
 });
 
 // Browserify task
@@ -62,7 +58,7 @@ gulp.task('browserify', function() {
   gulp.src(['app/scripts/main.js'])
   .pipe(browserify({
     insertGlobals: true,
-    debug: true
+    debug: false
   }))
   // Bundle to a single file
   .pipe(concat('bundle.js'))
@@ -76,16 +72,19 @@ gulp.task('views', function() {
     gulp.src('app/index.html')
     // And put it in the dist folder
     .pipe(gulp.dest('dist/'))
-    .pipe(refresh(lrserver));
 
     // Any other view files from app/views
     gulp.src('app/views/**/*')
     // Will be put in the dist/views folder
     .pipe(gulp.dest('dist/views/'))
-    .pipe(refresh(lrserver));
 });
 
 gulp.task('watch', ['lint'], function() {
+  // Start webserver
+  server.listen(serverport);
+  // Start live reload
+  refresh.listen(livereloadport);
+
   // Watch our scripts, and when they change run lint and browserify
   gulp.watch(['app/scripts/*.js', 'app/scripts/**/*.js'],[
     'lint',
@@ -97,9 +96,12 @@ gulp.task('watch', ['lint'], function() {
   ]);
 
   gulp.watch(['app/**/*.html'], [
-        'views'
-    ]);
+    'views'
+  ]);
+
+  gulp.watch('./dist/**').on('change', refresh.changed);
+
 });
 
 
-gulp.task('default',['dev', 'watch']);
+gulp.task('default', ['dev', 'watch']);
