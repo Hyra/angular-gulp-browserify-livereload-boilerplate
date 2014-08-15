@@ -100,3 +100,6 @@ gulp.task('watch', ['lint'], function() {
         'views'
     ]);
 });
+
+
+gulp.task('default',['dev', 'watch']);
